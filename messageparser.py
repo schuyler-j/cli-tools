@@ -1,8 +1,10 @@
 import re
 import random
 import time
+import matplotlib.pyplot as plt
 
-msg = open('msgfull.txt', 'r').read()
+file = '2022-12-05-stream-msgs.txt'
+msg = open(file, 'r').read()
 
 chunks = msg.split(';')
 
@@ -46,6 +48,15 @@ for name in usernames:
 
 #sort by most occurences
 #print(sorted(userdict.items(), key=lambda x: x[1], reverse=True))
+utctime = 1670244071.342
+print(utctime)
+print(time.ctime(utctime))
+y = []
+x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+for s in userdict:
+    y.append(userdict[s])
+print(x)
+plt.plot(x, y)
 
 pattern = r'^user-type='
 
@@ -71,8 +82,6 @@ def emoteCounter(p, f, d):
     div = d
     length = len(msgs)
     f = 0
-
-
     #print(max((msgs), key = msgs.count))
 
     for m in msgs:
@@ -90,9 +99,10 @@ def emoteCounter(p, f, d):
         prb = (tcount / len(msgs)) * 100
     print(f'{pattern} was said {tcount} times in the last {length} messages, which is {prb}% of the messages')
 
+'''
 emoteCounter(r'GIGACHAD', 0, 10)
 emoteCounter(r'LULW', 0, 10)
 emoteCounter(r'AWARE', 0, 10)
 emoteCounter(r'Nerd', 0, 10)
-        
+'''      
 
