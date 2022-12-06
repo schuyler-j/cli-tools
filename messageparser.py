@@ -20,12 +20,8 @@ for chunk in chunks:
         username = chunks[count-1].split('=')[1]
         usernames.append(username)
 
-
-
 ncount = 0
-
 unique = []
-
 for name in usernames:
     tempname = name
     for n in usernames:
@@ -46,16 +42,32 @@ for name in usernames:
             userdict.update({tempname: ncount})
     ncount = 0
 
-#sort by most occurences
+msgtimes = []
+time_pattern = r'rm-received-ts'
+count = 0
+for chunk in chunks:
+    x = re.findall(time_pattern, chunk)
+    count += 1
+    if x:
+        times = chunks[count-1].split('=')[1]
+        times_c = int(times)/1000
+        msgtimes.append(times_c)
+
+
+#sort by most username occurences
 #print(sorted(userdict.items(), key=lambda x: x[1], reverse=True))
-utctime = 1670244071.342
-print(utctime)
-print(time.ctime(utctime))
+
+#time conversion
+converted_times = []
+for t in msgtimes:
+    converted_time = time.ctime(t)
+    converted_times.append(converted_time)
+
+#temp plot
 y = []
-x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+x = msgtimes[:11]
 for s in userdict:
     y.append(userdict[s])
-print(x)
 plt.plot(x, y)
 
 pattern = r'^user-type='
@@ -72,7 +84,17 @@ for chunk in chunks:
        if s == []:
         pass
        else:
-        msgs.append(message[4: len(message)-1])
+        msgs.append(message[4: len(message)])
+
+def printChats():
+    fmtdchats = []
+    count = 0
+    for m in msgs:
+        t = ' '.join(m)[1:]
+        t = t.split('","@')
+        print(t[0], converted_times[count])
+        fmtdchats.append(t[0])
+        count += 1
 
 def emoteCounter(p, f, d):
     ocount = 0
@@ -81,7 +103,6 @@ def emoteCounter(p, f, d):
     counter = 0
     div = d
     length = len(msgs)
-    f = 0
     #print(max((msgs), key = msgs.count))
 
     for m in msgs:
@@ -101,8 +122,10 @@ def emoteCounter(p, f, d):
 
 '''
 emoteCounter(r'GIGACHAD', 0, 10)
+emoteCounter(r'GIGACHAD', 0, 10)
 emoteCounter(r'LULW', 0, 10)
-emoteCounter(r'AWARE', 0, 10)
-emoteCounter(r'Nerd', 0, 10)
+emoteCounter(r'Aware', 0, 10)
 '''      
+printChats()
+emoteCounter(r'Nerd', 0, 10)
 
