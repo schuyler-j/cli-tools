@@ -11,7 +11,7 @@ import sys
 
 
 def parser():
-    file = 'msgfull.txt'
+    file = '2022-12-06-stream-msgs.txt'
 
     #if file doesn't exist
     try:
@@ -28,6 +28,7 @@ def parser():
 
     usernames = []
 
+    print("finding usernames...")
     for chunk in chunks:
         x = re.findall(pattern, chunk)
         count += 1
@@ -35,8 +36,10 @@ def parser():
             username = chunks[count-1].split('=')[1]
             usernames.append(username)
 
+    print("done.")
     ncount = 0
     unique = []
+    print("sorting unique...")
     for name in usernames:
         tempname = name
         for n in usernames:
@@ -45,21 +48,25 @@ def parser():
                 ncount += 1
                 break
         ncount = 0
-
+    print("done.")
 
     userdict = {}
-    for name in usernames:
+    print("counting chats by user...")
+    """     for name in usernames:
         tempname = name
 
         for n in usernames:
             if n == tempname:
                 ncount += 1
                 userdict.update({tempname: ncount})
-        ncount = 0
+        ncount = 0 """
+    print("skipping...")
+    print("done.")
 
     msgtimes = []
     time_pattern = r'rm-received-ts'
     count = 0
+    print("collecting message times...")
     for chunk in chunks:
         x = re.findall(time_pattern, chunk)
         count += 1
@@ -69,20 +76,25 @@ def parser():
             msgtimes.append(times_c)
 
 
+    print("done.")
+
     #sort by most username occurences
     #print(sorted(userdict.items(), key=lambda x: x[1], reverse=True))
 
     #time conversion
     converted_times = []
+    print("converting from utc...")
     for t in msgtimes:
         converted_time = time.ctime(t)
         converted_times.append(converted_time)
 
+    print("done.")
 
     pattern = r'^user-type='
 
     place = 0
     msgs = []
+    print("putting messages into list...")
     for chunk in chunks:
         x = re.findall(pattern, chunk)
         place += 1
@@ -94,6 +106,11 @@ def parser():
             pass
         else:
             msgs.append(message[4: len(message)])
+    
+    print("done.")
+    print("")
+    print("messages collected from ", converted_times[0], " to ", converted_times[len(converted_times)-1])
+    print(len(msgs), " messages collected")
 
 
     return msgs, converted_times, msgtimes, userdict
@@ -116,7 +133,7 @@ def emoteCounter(f, d):
     msgs = parser()[0]
     ocount = 0
     tcount = 0
-    pattern = r'?GIGACHAD'
+    pattern = r'OMEGALUL'
     counter = 0
     div = d
     length = len(msgs)
@@ -144,27 +161,31 @@ def emoteCounter(f, d):
                 ocount = 0
 """
 
-    bigstring = ""
+    """     bigstring = ""
     for m in msgs:
-        msg_string = ' '.join(m)
         counter += 1
-        window = msg_string[counter:counter+length]
-        bigstring = bigstring + msg_string
         prb = (tcount / len(msgs)) * 100
 
     counter = 0
     length = 20
     for c in range(len(msgs)-length):
         window = msgs[counter:counter+length]
-
+        if pattern in window:
+            ocount += 1
 
         counter += length 
         ocount_array.append(ocount)
-        ocount = 0
-            
-    #print(f'{pattern} was said {tcount} times in the last {length} messages, which is {prb}% of the messages')
+        ocount = 0 """
 
-    print(ocount_array)
+    for m in msgs:
+        for t in m:
+            x = re.findall(pattern, t)
+            if x:
+                tcount += 1
+            
+    prb = (tcount / len(msgs)) * 100
+    print(f'{pattern} was said {tcount} times in the last {length} messages, which is {prb}% of the messages')
+
     return ocount_array
 
 def graph():
@@ -181,7 +202,7 @@ def graph():
     x = msgtimes[:len(msgs)]
     y = msgs
     plt.plot(x, y)
-    plt.show()
+    print(x)
 
 #test cases
 '''
@@ -194,7 +215,7 @@ emoteCounter(r'Nerd', 0, 10)
 
 
 
-
+#handle arguments
 
 args = sys.argv[1:]
 
@@ -202,14 +223,15 @@ if not args:
     print("No arguments given")
     sys.exit()
 
-options = {'p': 'print scatter plot', '-c': 'print chat messages', '-e': 'print emote count', '-a': 'auto run scraper'}
+options = {'g': 'print scatter plot', '-c': 'print chat messages', '-e': 'print emote count', '-a': 'auto run scraper'}
 
 commands = {
     '-a': lambda: os.system('python messagescraperloop.py'),
     '-h': lambda: print(f'Usage: python messageparser.py {options}'),
     '-c': lambda: printChats(),
     '-e': lambda: emoteCounter(0, 10),
-    '-p': lambda: graph(), 
+    '-g': lambda: graph(), 
+    '-p': lambda: parser(),
 }
 
 # Iterate over the arguments
