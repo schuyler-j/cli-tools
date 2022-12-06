@@ -15,7 +15,7 @@ def parser():
 
     #if file doesn't exist
     try:
-        msg = open(file, 'r').read()
+        msg = open(file, 'r', encoding='utf-8').read()
 
     except Exception as e:
         print("NO FILE", e)
@@ -98,17 +98,6 @@ def parser():
 
     return msgs, converted_times, msgtimes, userdict
 
-def graph():
-    #temp plot
-    msgtimes = parser()[2]
-    userdict = parser()[3]
-
-    y = []
-    x = msgtimes[:len(userdict)]
-    for s in userdict:
-        y.append(userdict[s])
-    plt.plot(x, y)
-    plt.show()
 
 def printChats():
     msgs = parser()[0]
@@ -127,26 +116,72 @@ def emoteCounter(f, d):
     msgs = parser()[0]
     ocount = 0
     tcount = 0
-    pattern = input('Enter emote: ')
+    pattern = r'?GIGACHAD'
     counter = 0
     div = d
     length = len(msgs)
     #print(max((msgs), key = msgs.count))
+    ocount_array = []
+    total = 0
 
-    for m in msgs:
-        if f:
+    """     for m in msgs:
+        if f: #print the chats
             print(' '.join(m)[1:])
         counter += 1
         for word in m:
-            x = re.findall(pattern, word)
-            if x:
-                ocount += 1
+            #x = re.findall(pattern, word)
+
+            window = msgs[counter:counter+length]
+            x = r'{}'.format(pattern)
+            x = "GIGACHAD"
+            print(window)
+            if x in window:
                 tcount += 1
+                ocount += 1
+                ocount_array.append(ocount)
 
             if counter % div == 0:
                 ocount = 0
+"""
+
+    bigstring = ""
+    for m in msgs:
+        msg_string = ' '.join(m)
+        counter += 1
+        window = msg_string[counter:counter+length]
+        bigstring = bigstring + msg_string
         prb = (tcount / len(msgs)) * 100
-    print(f'{pattern} was said {tcount} times in the last {length} messages, which is {prb}% of the messages')
+
+    counter = 0
+    length = 20
+    for c in range(len(msgs)-length):
+        window = msgs[counter:counter+length]
+
+
+        counter += length 
+        ocount_array.append(ocount)
+        ocount = 0
+            
+    #print(f'{pattern} was said {tcount} times in the last {length} messages, which is {prb}% of the messages')
+
+    print(ocount_array)
+    return ocount_array
+
+def graph():
+    #temp plot
+    msgtimes = parser()[2]
+    userdict = parser()[3]
+    msgs = emoteCounter(0, 10)
+
+
+    y = [] #chatter freq
+    x = msgtimes[:len(userdict)]
+    for s in userdict:
+        y.append(userdict[s])
+    x = msgtimes[:len(msgs)]
+    y = msgs
+    plt.plot(x, y)
+    plt.show()
 
 #test cases
 '''
