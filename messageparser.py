@@ -20,6 +20,7 @@ def parser():
     except Exception as e:
         print("NO FILE", e)
         sys.exit()
+
     chunks = msg.split(';')
 
     pattern = r'^display-name='
@@ -77,12 +78,6 @@ def parser():
         converted_time = time.ctime(t)
         converted_times.append(converted_time)
 
-    #temp plot
-    """ y = []
-    x = msgtimes[:11]
-    for s in userdict:
-        y.append(userdict[s])
-    plt.plot(x, y) """
 
     pattern = r'^user-type='
 
@@ -101,7 +96,19 @@ def parser():
             msgs.append(message[4: len(message)])
 
 
-    return msgs, converted_times
+    return msgs, converted_times, msgtimes, userdict
+
+def graph():
+    #temp plot
+    msgtimes = parser()[2]
+    userdict = parser()[3]
+
+    y = []
+    x = msgtimes[:len(userdict)]
+    for s in userdict:
+        y.append(userdict[s])
+    plt.plot(x, y)
+    plt.show()
 
 def printChats():
     msgs = parser()[0]
@@ -111,6 +118,7 @@ def printChats():
     for m in msgs:
         t = ' '.join(m)[1:]
         t = t.split('","@')
+        #TODO make the time optional 
         print(t[0], converted_times[count])
         fmtdchats.append(t[0])
         count += 1
@@ -159,13 +167,14 @@ if not args:
     print("No arguments given")
     sys.exit()
 
-options = {'-p': 'print chat messages', '-e': 'print emote count', '-a': 'auto run scraper'}
+options = {'p': 'print scatter plot', '-c': 'print chat messages', '-e': 'print emote count', '-a': 'auto run scraper'}
 
 commands = {
     '-a': lambda: os.system('python messagescraperloop.py'),
-    '-h': lambda: print(f'Usage: python messageparser.py {options}', options),
-    '-p': lambda: printChats(),
-    '-e': lambda: emoteCounter(0, 10)
+    '-h': lambda: print(f'Usage: python messageparser.py {options}'),
+    '-c': lambda: printChats(),
+    '-e': lambda: emoteCounter(0, 10),
+    '-p': lambda: graph(), 
 }
 
 # Iterate over the arguments
